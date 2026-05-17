@@ -228,3 +228,6 @@ Each module contains:
 3. Follow the modules in order
 4. Complete the exercises
 5. Explore the biological applications
+
+---
+*Built with AI assistance from [Claude (Anthropic)](https://claude.com/).*
