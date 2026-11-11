@@ -67,5 +67,37 @@ class TestNumeralEdgeCases(unittest.TestCase):
         self.assertEqual(BabylonianNumber(0).format_sexagesimal(), "0")
 
 
+class TestGoldenRatioPairs(unittest.TestCase):
+    """analyze_gene_lengths listed every golden-ratio pair once per input length."""
+
+    def test_pairs_listed_once(self):
+        from bio_math_patterns import BioMathPatterns
+        a = BioMathPatterns().analyze_gene_lengths([610, 987, 1597, 2584])
+        pairs = [(p[0], p[1]) for p in a["golden_ratio_approximations"]]
+        self.assertEqual(pairs, [(610, 987), (987, 1597), (1597, 2584)])
+
+
+class TestPatternAnalyzerEdgeCases(unittest.TestCase):
+    """'Multiple of Fib' was always True (every n is a multiple of 1); n=1 crashed analyze_prime_factors."""
+
+    def test_multiple_of_fib_ignores_one(self):
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        from bio_math_enhanced import FibonacciAnalyzer
+        fa = FibonacciAnalyzer()
+        fig, ax = plt.subplots()
+        fa.plot_properties(7, ax)   # 7 is not a multiple of any Fibonacci number > 1
+        heights = [p.get_height() for p in ax.patches]
+        plt.close(fig)
+        self.assertEqual(heights[2], 0)
+
+    def test_prime_factors_of_one(self):
+        from bio_math_enhanced import MathematicalPatternAnalyzer
+        r = MathematicalPatternAnalyzer().analyze_prime_factors(1)
+        self.assertEqual(r["prime_factors"], [])
+        self.assertIsNone(r["largest_prime_factor"])
+
+
 if __name__ == "__main__":
     unittest.main()

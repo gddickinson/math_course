@@ -93,14 +93,14 @@ class BioMathPatterns:
             if length in fib_numbers:
                 analysis['fibonacci_matches'].append(length)
             
-            # Check golden ratio approximations
-            for i in range(len(lengths)):
-                for j in range(i+1, len(lengths)):
-                    ratio = lengths[j] / lengths[i]
-                    if abs(ratio - self.golden_ratio) < 0.1:
-                        analysis['golden_ratio_approximations'].append(
-                            (lengths[i], lengths[j], ratio)
-                        )
+        # Check golden ratio approximations (each pair once)
+        for i in range(len(lengths)):
+            for j in range(i+1, len(lengths)):
+                ratio = lengths[j] / lengths[i]
+                if abs(ratio - self.golden_ratio) < 0.1:
+                    analysis['golden_ratio_approximations'].append(
+                        (lengths[i], lengths[j], ratio)
+                    )
         
         return analysis
     

@@ -90,7 +90,7 @@ class FibonacciAnalyzer:
                                 analysis['distance_to_upper']) < n * 0.1,
             'Multiple of Fib': any(n % fib == 0
                                  for fib in self.fib_list[2:analysis['upper_index']+1]
-                                 if fib != 0),
+                                 if fib > 1),  # every n is a multiple of 1
             'Between Consecutive': analysis['nearest_lower'] != analysis['nearest_upper']
         }
 
@@ -171,8 +171,8 @@ class MathematicalPatternAnalyzer:
             'unique_factors': list(factor_counts.keys()),
             'factor_counts': dict(factor_counts),
             'is_prime': len(factors) == 1,
-            'largest_prime_factor': max(factors),
-            'smallest_prime_factor': min(factors)
+            'largest_prime_factor': max(factors) if factors else None,  # n = 1 has none
+            'smallest_prime_factor': min(factors) if factors else None
         }
 
     def analyze_divisibility(self, n: int) -> dict:
