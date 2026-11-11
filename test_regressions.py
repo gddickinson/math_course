@@ -44,5 +44,28 @@ class TestEgyptianMultiplicationSteps(unittest.TestCase):
         self.assertEqual(BabylonianSquareRoot(0).calculate(), 0.0)
 
 
+class TestNumeralEdgeCases(unittest.TestCase):
+    """Chinese numerals gained a trailing 零 for round numbers; 100000+ raised KeyError; Babylonian 0 was blank."""
+
+    def test_chinese_round_numbers(self):
+        from world_numbers import ChineseNumeral
+        self.assertEqual(ChineseNumeral(20).chinese, "二十")
+        self.assertEqual(ChineseNumeral(100).chinese, "一百")
+        self.assertEqual(ChineseNumeral(2020).chinese, "二千零二十")
+        self.assertEqual(ChineseNumeral(10000).chinese, "一万")
+        self.assertEqual(ChineseNumeral(1001).chinese, "一千零一")
+        self.assertEqual(ChineseNumeral(2024).chinese, "二千零二十四")
+
+    def test_chinese_out_of_range_is_value_error(self):
+        from world_numbers import ChineseNumeral
+        with self.assertRaises(ValueError):
+            ChineseNumeral(100000)
+
+    def test_babylonian_zero(self):
+        from ancient_numbers import BabylonianNumber
+        self.assertEqual(BabylonianNumber(0).sexagesimal, [0])
+        self.assertEqual(BabylonianNumber(0).format_sexagesimal(), "0")
+
+
 if __name__ == "__main__":
     unittest.main()

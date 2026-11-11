@@ -70,7 +70,7 @@ class BabylonianNumber:
             quotient, remainder = divmod(quotient, 60)
             remainders.append(remainder)
             
-        return remainders[::-1]
+        return remainders[::-1] if remainders else [0]
     
     def format_sexagesimal(self):
         """Format number in Babylonian style using Unicode wedge and corner symbols"""

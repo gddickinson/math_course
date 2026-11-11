@@ -106,6 +106,8 @@ class ChineseNumeral:
         """Convert number to traditional Chinese numerals"""
         if not isinstance(self.number, int) or self.number < 0:
             raise ValueError("Number must be a positive integer")
+        if self.number >= 100000:
+            raise ValueError("Chinese numerals here support numbers below 100000 (place names up to 万)")
             
         if self.number == 0:
             return self.CHINESE_DIGITS[0]
@@ -123,7 +125,7 @@ class ChineseNumeral:
             elif result and result[-1] != self.CHINESE_DIGITS[0]:
                 result += self.CHINESE_DIGITS[0]
                 
-        return result
+        return result.rstrip(self.CHINESE_DIGITS[0])  # no trailing 零 for round numbers
 
 def demonstrate_number_systems():
     """Demonstrate various ancient number systems"""
