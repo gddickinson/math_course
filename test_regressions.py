@@ -136,5 +136,20 @@ class TestSequenceCodons(unittest.TestCase):
         self.assertEqual(dict(a._analyze_codons()["most_common"]), {"ATG": 2, "TTT": 1})
 
 
+class TestTreeModelSpecies(unittest.TestCase):
+    """compare_species() left the model switched to the last species (birch)."""
+
+    def test_species_restored(self):
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        from advanced_tree_patterns import AdvancedTreeModel
+        m = AdvancedTreeModel("oak")
+        m.compare_species()
+        plt.close("all")
+        self.assertEqual(m.species, "oak")
+        self.assertEqual(m.params, AdvancedTreeModel.SPECIES_PARAMS["oak"])
+
+
 if __name__ == "__main__":
     unittest.main()

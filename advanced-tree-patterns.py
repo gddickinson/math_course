@@ -239,6 +239,7 @@ class AdvancedTreeModel:
     def compare_species(self, season: str = 'summer'):
         """Compare different tree species"""
         fig, axes = plt.subplots(1, 3, figsize=(24, 8))
+        original_species = self.species
         
         for i, species in enumerate(self.SPECIES_PARAMS.keys()):
             self.species = species
@@ -259,6 +260,10 @@ class AdvancedTreeModel:
             ax.set_title(f'{species.capitalize()}')
             ax.axis('equal')
             ax.grid(True, alpha=0.3)
+        
+        # restore the model's own species (the loop above switches it)
+        self.species = original_species
+        self.params = self.SPECIES_PARAMS[original_species]
         
         plt.suptitle(f'Different Tree Species in {season.capitalize()}', fontsize=16)
         plt.tight_layout()
