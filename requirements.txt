@@ -2,3 +2,4 @@ numpy>=1.24.0
 matplotlib>=3.7.0
 scipy>=1.10.0
 sympy>=1.12
+biopython>=1.80  # bio_sequence_analysis.py, ip3r_analysis.py, math_bio_demo.py

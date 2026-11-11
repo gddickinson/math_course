@@ -10,4 +10,5 @@ Advanced Mathematics and Mathematical Biology course materials.
 - Tests: `python -m pytest test_math_course.py -v`
 
 ## Dependencies
-See `requirements.txt`: numpy, matplotlib, scipy, sympy.
+See `requirements.txt`: numpy, matplotlib, scipy, sympy, biopython
+(biopython only for the NCBI sequence scripts).

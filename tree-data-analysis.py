@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
 from typing import List, Tuple, Dict
-import pandas as pd
 
 class TreeDataAnalysis:
     """

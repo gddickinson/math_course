@@ -5,7 +5,6 @@ import math
 from collections import Counter
 from Bio import Entrez, SeqIO
 from Bio.Seq import Seq
-import requests
 import io
 import re
 
