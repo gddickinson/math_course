@@ -70,7 +70,7 @@ class NCBISequenceAnalyzer:
     def _analyze_codons(self) -> Dict:
         """Analyze codon usage and patterns"""
         # Convert to coding sequence if not already
-        if 'mRNA' in self.gene_info['name'].lower():
+        if 'mrna' in self.gene_info['name'].lower():
             coding_seq = self.sequence
         else:
             coding_seq = str(Seq(self.sequence).transcribe())

@@ -27,10 +27,10 @@ class IP3RAnalyzer:
             'regulatory': [(918, 1207), (1574, 1654)]  # Regulatory domains
         }
 
-        # Calcium binding motifs
+        # Calcium binding motifs (regular expressions; PROSITE style D-[DNS]-[DNS]-[DNS])
         self.ca_motifs = [
-            'D-[DNS]-[DNS]-[DNS]',  # EF-hand like
-            '[DE]-[LIVMFYW]-[DNS]-[DNS]'  # Modified EF-hand
+            'D[DNS][DNS][DNS]',  # EF-hand like
+            '[DE][LIVMFYW][DNS][DNS]'  # Modified EF-hand
         ]
 
     def fetch_homologs(self, species: List[str]) -> Dict:
@@ -92,14 +92,10 @@ class IP3RAnalyzer:
                     'average_conservation': sum(r['conservation'] for r in domain_results) / len(domain_results) \
                                          if any(r['conservation'] is not None for r in domain_results) else None
                 }
-
-            results[domain_name] = {
-                'length': len(domain_seq),
-                'gc_content': (domain_seq.count('G') +
-                             domain_seq.count('C')) / len(domain_seq),
-                'hydrophobicity': self._calculate_hydrophobicity(domain_seq),
-                'conservation': self._calculate_conservation(domain_seq)
-            }
+                if len(domain_results) > 1:
+                    # same keys as single-region domains, for callers that read 'length'/'conservation'
+                    results[domain_name]['length'] = results[domain_name]['total_length']
+                    results[domain_name]['conservation'] = results[domain_name]['average_conservation']
 
         return results
 

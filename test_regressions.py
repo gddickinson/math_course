@@ -99,5 +99,42 @@ class TestPatternAnalyzerEdgeCases(unittest.TestCase):
         self.assertIsNone(r["largest_prime_factor"])
 
 
+@unittest.skipUnless(HAS_BIO, "biopython not installed")
+class TestIP3RAnalyzer(unittest.TestCase):
+    """analyze_domains overwrote every result with the last region's slice (NameError on short sequences);
+    the PROSITE-style calcium motifs ('D-[DNS]-...') were used as regexes and could never match."""
+
+    def test_domains_short_sequence(self):
+        from ip3r_analysis import IP3RAnalyzer
+        r = IP3RAnalyzer("test@example.org").analyze_domains("ATG" * 100)   # shorter than every domain
+        self.assertEqual(r, {})
+
+    def test_domains_have_own_lengths(self):
+        from ip3r_analysis import IP3RAnalyzer
+        r = IP3RAnalyzer("test@example.org").analyze_domains("ATGGCC" * 500)  # 3000 nt
+        self.assertEqual(r["IP3_binding"]["length"], 604 - 224)
+        self.assertEqual(r["suppressor"]["length"], 1654 - 1574)
+        self.assertEqual(r["regulatory"]["total_length"], (1207 - 918) + (1654 - 1574))
+        self.assertEqual(r["regulatory"]["length"], r["regulatory"]["total_length"])
+
+    def test_calcium_motif_matches(self):
+        from ip3r_analysis import IP3RAnalyzer
+        # GAT GAC AAC TCC -> D D N S, an EF-hand-like D-[DNS]-[DNS]-[DNS] match
+        sites = IP3RAnalyzer("test@example.org").find_calcium_binding_sites("GATGACAACTCC")
+        self.assertTrue(any(s["sequence"] == "DDNS" for s in sites))
+
+
+@unittest.skipUnless(HAS_BIO, "biopython not installed")
+class TestSequenceCodons(unittest.TestCase):
+    """_analyze_codons tested 'mRNA' in a lower-cased string, so mRNA records were always transcribed."""
+
+    def test_mrna_used_as_is(self):
+        from bio_sequence_analysis import NCBISequenceAnalyzer
+        a = NCBISequenceAnalyzer("test@example.org")
+        a.sequence = "ATGATGTTT"
+        a.gene_info = {"name": "Homo sapiens ITPR1, mRNA"}
+        self.assertEqual(dict(a._analyze_codons()["most_common"]), {"ATG": 2, "TTT": 1})
+
+
 if __name__ == "__main__":
     unittest.main()
