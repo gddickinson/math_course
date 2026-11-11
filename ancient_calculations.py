@@ -15,6 +15,7 @@ class EgyptianMultiplication:
         """Perform Egyptian multiplication, recording each step"""
         a, b = self.multiplicand, self.multiplier
         result = 0
+        self.steps = []  # start a fresh table on every call
         
         while b > 0:
             self.steps.append({
@@ -33,6 +34,7 @@ class EgyptianMultiplication:
     
     def show_work(self):
         """Display the multiplication process"""
+        result = self.multiply()  # fills self.steps
         print(f"\nMultiplying {self.multiplicand} × {self.multiplier}")
         print("\nEgyptian method steps:")
         print("Multiplier  Multiplicand  Include in sum")
@@ -42,7 +44,7 @@ class EgyptianMultiplication:
             include = "Yes" if step['include'] else "No"
             print(f"{step['multiplier']:^10d} {step['multiplicand']:^12d} {include:^13s}")
             
-        print(f"\nResult: {self.multiply()}")
+        print(f"\nResult: {result}")
 
 
 class BabylonianSquareRoot:
@@ -59,6 +61,9 @@ class BabylonianSquareRoot:
         """Calculate square root using Babylonian method"""
         if self.number < 0:
             raise ValueError("Cannot calculate square root of negative number")
+        self.steps = []  # start a fresh table on every call
+        if self.number == 0:
+            return 0.0  # the initial guess n/2 would divide by zero
             
         # Initial guess - Babylonians often used this simple but effective starting point
         x = self.number / 2
