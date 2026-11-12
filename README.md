@@ -217,8 +217,7 @@ So far they cover parts of Module 1, the phyllotaxis/Fibonacci material of Modul
 ├── advanced_tree_patterns.py, tree_data_analysis.py
 ├── shell_growth_patterns.py, shell_comparative_analysis.py
 ├── bio_sequence_analysis.py, ip3r_analysis.py    # NCBI sequence analysis (biopython, internet)
-├── test_math_course.py, test_regressions.py      # tests
-└── *-*.py                                        # older hyphenated copies of the same scripts
+└── test_math_course.py, test_regressions.py      # tests
 ```
 Exercises and problem sets are planned (see the Implementation Notes above) but not in the repository yet.
 

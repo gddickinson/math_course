@@ -30,10 +30,10 @@ A collection of 16+ standalone Python scripts implementing mathematical concepts
 - [ ] Add assessment system: quizzes, coding challenges, project templates
 
 ## Technical Debt
-- [x] Hyphenated filenames (`bio-math-patterns.py`) cannot be imported as Python modules
+- [x] Hyphenated filenames (`bio-math-patterns.py`) cannot be imported as Python modules (duplicates removed 2026-11-11)
 - [ ] No shared code between scripts — significant duplication of plotting, formatting, and math functions
 - [ ] README describes 7 modules but only ~2 are partially implemented
-- [ ] `bio_math_enhanced.py` vs `bio-math-patterns.py` — naming inconsistency and potential overlap
+- [ ] `bio_math_enhanced.py` vs `bio_math_patterns.py` — naming inconsistency and potential overlap
 - [x] No tests — mathematical functions should have unit tests with known analytical results
 - [x] `.ipynb_checkpoints/` is tracked in the repo (now in .gitignore)
 - [ ] Scripts lack `if __name__ == "__main__":` guards, making them hard to import safely

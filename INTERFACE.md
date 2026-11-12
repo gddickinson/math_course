@@ -49,7 +49,6 @@ Python" in the local app.
 
 ## Notes
 
-- Hyphenated originals (e.g., `ancient-numbers.py`) are identical copies kept for backward compatibility.
-  The underscore versions (e.g., `ancient_numbers.py`) are the importable copies; bug fixes were applied to both.
+- The old hyphenated duplicates (e.g. `ancient-numbers.py`) were removed; use the underscore names.
 - `bio_math_enhanced.py` vs `bio_math_patterns.py`: enhanced version adds `FibonacciAnalyzer`
   and `MathematicalPatternAnalyzer` with more advanced analysis; patterns has the base `BioMathPatterns`.
