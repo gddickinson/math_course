@@ -229,5 +229,25 @@ Exercises and problem sets are planned (see the Implementation Notes above) but 
 4. Run the scripts (`python ancient_numbers.py`, ...) and the tests (`python -m pytest test_math_course.py test_regressions.py`)
 5. Explore the biological applications
 
+## Interactive course (web site)
+The course is also an interactive web site: one page per lesson in the order of the outline above, with the
+outline text, every Python example as a live figure with sliders (computed in the browser by JavaScript ports
+of the scripts, tested against the Python output), the scripts' docstrings and their full, highlighted source.
+
+Published at https://gddickinson.github.io/math_course/ (built by `.github/workflows/pages.yml` on push to main).
+
+![Home page](docs/img/home.png)
+![Phyllotaxis figure](docs/img/fig_phyllotaxis.png)
+![Babylonian square root figure](docs/img/fig_sqrt.png)
+![Tree growth figure](docs/img/fig_tree.png)
+
+### Run the web app
+```bash
+pip install -r requirements-web.txt
+python run_web.py                     # http://127.0.0.1:8164 (adds "Check with Python" on every figure)
+python scripts/build_static.py        # static copy in site/, as published on GitHub Pages
+python -m pytest -q tests/test_web.py # API, static build, fixture and node tests
+```
+
 ---
 *Built with AI assistance from [Claude (Anthropic)](https://claude.com/).*

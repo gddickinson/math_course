@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Math Course for Biologists</title>
+<meta name="description" content="An interactive course: ancient number systems, number theory, Fibonacci patterns, growth models, trees, shells and sequences, with every Python example as a live figure.">
+<link rel="icon" href="static/icon.svg">
+<link rel="stylesheet" href="static/style.css">
+<link rel="stylesheet" href="static/style_app.css">
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<header class="top">
+  <a class="brand" href="#/"><span class="mark"></span>Math Course</a>
+  <nav class="groups">
+    <details><summary>Lessons</summary><div class="menu">
+      <a href="#/lesson/numerals">1 · Ancient Number Systems</a>
+      <a href="#/lesson/calculations">2 · Early Computational Methods</a>
+      <a href="#/lesson/number-theory">3 · Number Theory Foundations</a>
+      <a href="#/lesson/bio-number-theory">4 · Number Theory in Biology</a>
+      <a href="#/lesson/patterns">5 · Fibonacci, Phyllotaxis, Golden Ratio</a>
+      <a href="#/lesson/growth">6 · Growth Patterns and Populations</a>
+      <a href="#/lesson/trees">7 · Tree Branching</a>
+      <a href="#/lesson/shells">8 · Shell Growth</a>
+      <a href="#/lesson/sequences">9 · Biological Sequences</a>
+    </div></details>
+    <a href="#/syllabus" data-nav="syllabus">Outline</a>
+    <a href="#/about" data-nav="about">About</a>
+  </nav>
+  <div class="right"><a class="small mute" href="https://github.com/gddickinson/math_course" target="_blank" rel="noopener">GitHub</a></div>
+</header>
+<main id="app" tabindex="-1"></main>
+<footer class="foot">Math Course for Biologists · <a href="https://github.com/gddickinson/math_course">source on GitHub</a> · <span id="mode"></span></footer>
+<script type="module" src="static/main.js"></script>
+</body>
+</html>
