@@ -203,30 +203,30 @@ Students will:
 - Analyze real biological data using mathematical tools
 
 ## Code Structure
-The repository is organized as follows:
+The scripts are standalone files at the repository root (no `Module1/`-style folders yet; see ROADMAP.md).
+So far they cover parts of Module 1, the phyllotaxis/Fibonacci material of Module 3 and the Special Topics:
 ```
-├── Module1/
-│   ├── ancient-numbers.py
-│   ├── number-theory-basics.py
-│   └── biological-applications/
-├── Module2/
-│   ├── algebraic-systems.py
-│   └── biological-functions.py
-...etc
+├── ancient_numbers.py, world_numbers.py          # Egyptian, Babylonian, Roman, Mayan, Chinese numerals
+├── ancient_calculations.py                       # Egyptian multiplication, Babylonian square root
+├── ancient_math_visualization.py                 # Tkinter app for the two algorithms
+├── number_theory_basics.py                       # Euclid, sieve, factorization, Diophantine equations
+├── bio_number_theory.py                          # cicada cycles, DNA lengths
+├── bio_math_patterns.py, bio_math_enhanced.py    # phyllotaxis, Fibonacci and golden-ratio analysis
+├── math_bio_demo.py                              # combined demo (example 2 uses NCBI)
+├── bio_growth_patterns.py                        # fractal trees, shell spiral, population models
+├── advanced_tree_patterns.py, tree_data_analysis.py
+├── shell_growth_patterns.py, shell_comparative_analysis.py
+├── bio_sequence_analysis.py, ip3r_analysis.py    # NCBI sequence analysis (biopython, internet)
+├── test_math_course.py, test_regressions.py      # tests
+└── *-*.py                                        # older hyphenated copies of the same scripts
 ```
-
-Each module contains:
-- Core mathematical implementations
-- Biological application examples
-- Visualization tools
-- Test cases
-- Documentation
+Exercises and problem sets are planned (see the Implementation Notes above) but not in the repository yet.
 
 ## Getting Started
 1. Clone the repository
 2. Install requirements
 3. Follow the modules in order
-4. Complete the exercises
+4. Run the scripts (`python ancient_numbers.py`, ...) and the tests (`python -m pytest test_math_course.py test_regressions.py`)
 5. Explore the biological applications
 
 ---
