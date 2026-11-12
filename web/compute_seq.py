@@ -37,6 +37,5 @@ def ip3r(p):
     from ip3r_analysis import IP3RAnalyzer
     a = IP3RAnalyzer("offline@example.org")
     s = clean(p["seq"])
-    from Bio.Seq import Seq
-    return {"protein": str(Seq(s[: len(s) - len(s) % 3]).translate()),
+    return {"cds": list(a.find_cds(s)), "protein": a.cds_protein(s)[1],
             "domains": a.analyze_domains(s), "sites": a.find_calcium_binding_sites(s)}

@@ -10,10 +10,35 @@ const count = (s, ch) => s.split(ch).length - 1;
 const B = 'TCAG', AA = 'FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG';
 export const CODON_TABLE = {};
 for (let i = 0; i < 64; i++) CODON_TABLE[B[i >> 4] + B[(i >> 2) & 3] + B[i & 3]] = AA[i];
-export function translate(s) {
+export function translate(s, toStop = false) {
   let p = '';
-  for (let i = 0; i + 3 <= s.length; i += 3) p += CODON_TABLE[s.slice(i, i + 3)];
+  for (let i = 0; i + 3 <= s.length; i += 3) {
+    const a = CODON_TABLE[s.slice(i, i + 3)];
+    if (toStop && a === '*') break;
+    p += a;
+  }
   return p;
+}
+
+// IP3RAnalyzer.find_cds(): longest ATG...stop open reading frame (frames 0-2), [start, end) in nucleotides.
+export function findCds(s) {
+  let best = [0, 0];
+  for (let frame = 0; frame < 3; frame++) {
+    let start = null;
+    for (let i = frame; i < s.length - 2; i += 3) {
+      const c = s.slice(i, i + 3);
+      if (start === null && c === 'ATG') start = i;
+      else if (start !== null && (c === 'TAA' || c === 'TAG' || c === 'TGA')) {
+        if (i + 3 - start > best[1] - best[0]) best = [start, i + 3];
+        start = null;
+      }
+    }
+    if (start !== null) {
+      const end = start + Math.floor((s.length - start) / 3) * 3;
+      if (end - start > best[1] - best[0]) best = [start, end];
+    }
+  }
+  return best;
 }
 
 // NCBISequenceAnalyzer._find_repeats(): every k-mer (k = 4..10) seen more than once, in first-seen order.
@@ -53,7 +78,7 @@ export function sequence({ seq, mrna = false }) {
   };
 }
 
-// IP3RAnalyzer tables (positions as the script gives them; it slices the nucleotide sequence with them).
+// IP3RAnalyzer tables: domain ranges are amino-acid residues (1-based, inclusive), mapped onto the mRNA via its CDS.
 export const DOMAINS = { IP3_binding: [[224, 604]], calcium_binding: [[2230, 2749]], channel_region: [[2398, 2589]],
   suppressor: [[1574, 1654]], regulatory: [[918, 1207], [1574, 1654]] };
 export const MULTI = new Set(['calcium_binding', 'regulatory']);   // given as lists in Python
@@ -67,24 +92,25 @@ export function hydrophobicity(dna) {
 }
 
 export function ip3r({ seq }) {
-  const s = clean(seq), domains = {};
+  const s = clean(seq), domains = {}, cds = findCds(s), protein = translate(s.slice(cds[0], cds[1]), true);
   for (const [name, regions] of Object.entries(DOMAINS)) {
-    const res = regions.filter(([, e]) => e <= s.length).map(([a, e]) => {
-      const d = s.slice(a, e);
-      return { length: d.length, gc_content: (count(d, 'G') + count(d, 'C')) / d.length, hydrophobicity: hydrophobicity(d),
-        conservation: null };
+    const res = regions.filter(([, e]) => e <= protein.length).map(([a, e]) => {
+      const d = s.slice(cds[0] + 3 * (a - 1), cds[0] + 3 * e);
+      return { length: e - a + 1, nt_length: d.length, gc_content: (count(d, 'G') + count(d, 'C')) / d.length,
+        hydrophobicity: hydrophobicity(d), conservation: null };
     });
     if (!res.length) continue;
     if (res.length === 1) { domains[name] = res[0]; continue; }
     const tot = res.reduce((t, r) => t + r.length, 0);
     domains[name] = { regions: res, total_length: tot, average_conservation: null, length: tot, conservation: null };
   }
-  const protein = translate(s), sites = [];
+  const sites = [];
   for (const m of CA_MOTIFS) {
     for (const hit of protein.matchAll(new RegExp(m, 'g'))) {
-      sites.push({ motif: m, position: hit.index, sequence: hit[0],
-        in_known_domain: DOMAINS.calcium_binding.some(([a, e]) => a <= hit.index * 3 && hit.index * 3 <= e) });
+      const pos = hit.index + 1;   // residue number
+      sites.push({ motif: m, position: pos, sequence: hit[0],
+        in_known_domain: DOMAINS.calcium_binding.some(([a, e]) => a <= pos && pos <= e) });
     }
   }
-  return { protein, domains, sites };
+  return { cds, protein, domains, sites };
 }

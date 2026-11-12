@@ -4,7 +4,7 @@ from Bio.Seq import Seq
 from Bio import motifs
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import List, Dict
+from typing import List, Dict, Tuple
 import subprocess
 import tempfile
 import re
@@ -18,7 +18,8 @@ class IP3RAnalyzer:
         self.sequences = {}
         self.alignments = {}
 
-        # Known IP3R domains and motifs
+        # Known IP3R1 domains: amino-acid residue ranges (1-based, inclusive) of the receptor protein.
+        # analyze_domains() maps them onto the mRNA through its coding sequence (CDS).
         self.domains = {
             'IP3_binding': (224, 604),  # IP3 binding core
             'calcium_binding': [(2230, 2749)],  # Ca2+ binding regions
@@ -32,6 +33,35 @@ class IP3RAnalyzer:
             'D[DNS][DNS][DNS]',  # EF-hand like
             '[DE][LIVMFYW][DNS][DNS]'  # Modified EF-hand
         ]
+
+    @staticmethod
+    def find_cds(sequence: str) -> Tuple[int, int]:
+        """Coding sequence of an mRNA: the longest open reading frame (ATG ... stop codon) on the given strand.
+
+        Returns (start, end) nucleotide indices, end just after the stop codon (or the last whole codon if there
+        is no stop). (0, 0) if there is no ATG. Used because the FASTA records fetched here carry no CDS annotation.
+        """
+        best = (0, 0)
+        for frame in range(3):
+            start = None
+            for i in range(frame, len(sequence) - 2, 3):
+                codon = sequence[i:i + 3]
+                if start is None and codon == 'ATG':
+                    start = i
+                elif start is not None and codon in ('TAA', 'TAG', 'TGA'):
+                    if i + 3 - start > best[1] - best[0]:
+                        best = (start, i + 3)
+                    start = None
+            if start is not None:
+                end = start + (len(sequence) - start) // 3 * 3
+                if end - start > best[1] - best[0]:
+                    best = (start, end)
+        return best
+
+    def cds_protein(self, sequence: str) -> Tuple[int, str]:
+        """(CDS start, protein) for an mRNA: the CDS translated up to its stop codon."""
+        start, end = self.find_cds(sequence)
+        return start, str(Seq(sequence[start:end]).translate(to_stop=True))
 
     def fetch_homologs(self, species: List[str]) -> Dict:
         """Fetch IP3R1 sequences from multiple species"""
@@ -59,8 +89,14 @@ class IP3RAnalyzer:
         return sequences
 
     def analyze_domains(self, sequence: str) -> Dict:
-        """Analyze domain conservation and properties"""
+        """Analyze domain conservation and properties.
+
+        Domain positions are residue numbers, so each region (a, b) is cut from the mRNA at nucleotides
+        cds_start + 3*(a-1) ... cds_start + 3*b, i.e. in the reading frame of the coding sequence. Regions beyond
+        the end of the protein are skipped. 'length' is in residues, 'nt_length' in nucleotides.
+        """
         results = {}
+        cds_start, protein = self.cds_protein(sequence)
 
         for domain_name, domain_pos in self.domains.items():
             # Handle both single tuples and lists of tuples
@@ -72,17 +108,18 @@ class IP3RAnalyzer:
             # Process each region of the domain
             domain_results = []
             for start, end in domain_positions:
-                if end <= len(sequence):
-                    domain_seq = sequence[start:end]
+                if end <= len(protein):
+                    offset = 3 * (start - 1)
+                    domain_seq = sequence[cds_start + offset:cds_start + 3 * end]
 
                     domain_results.append({
-                        'length': len(domain_seq),
+                        'length': end - start + 1,
+                        'nt_length': len(domain_seq),
                         'gc_content': (domain_seq.count('G') +
                                      domain_seq.count('C')) / len(domain_seq),
                         'hydrophobicity': self._calculate_hydrophobicity(domain_seq),
-                        'conservation': self._calculate_conservation(domain_seq)
+                        'conservation': self._calculate_conservation(domain_seq, offset)
                     })
-
             # Combine results if multiple regions
             if domain_results:
                 results[domain_name] = domain_results[0] if len(domain_results) == 1 \
@@ -112,8 +149,12 @@ class IP3RAnalyzer:
         total = sum(kd_scale.get(aa, 0) for aa in aa_seq)
         return total / len(aa_seq)
 
-    def _calculate_conservation(self, sequence: str) -> float:
-        """Calculate sequence conservation across species"""
+    def _calculate_conservation(self, sequence: str, cds_offset: int = None) -> float:
+        """Calculate sequence conservation across species.
+
+        With cds_offset (nucleotides from the start of the CDS), each homolog is compared at the same place in its
+        own CDS; without it, from the start of each sequence.
+        """
         if not self.sequences:
             return None
 
@@ -124,34 +165,38 @@ class IP3RAnalyzer:
         # Convert SeqRecord objects to strings for comparison
         seq_strings = {species: str(seq.seq) for species, seq in self.sequences.items()}
 
+        base = {sp: (self.find_cds(s)[0] + cds_offset if cds_offset is not None else 0)
+                for sp, s in seq_strings.items()}
+
         for pos in range(0, len(sequence), 3):
             if pos + 3 > len(sequence):
                 break
 
             codon = sequence[pos:pos+3]
             # Compare with sequence strings instead of SeqRecord objects
-            if all(len(seq_str) > pos+2 and seq_str[pos:pos+3] == codon
-                  for seq_str in seq_strings.values()):
+            if all(len(seq_str) > base[sp] + pos + 2 and seq_str[base[sp] + pos:base[sp] + pos + 3] == codon
+                  for sp, seq_str in seq_strings.items()):
                 conserved += 1
             total += 1
 
         return conserved / total if total > 0 else 0
 
     def find_calcium_binding_sites(self, sequence: str) -> List[Dict]:
-        """Identify potential calcium binding sites"""
+        """Identify potential calcium binding sites in the protein encoded by the mRNA's CDS.
+        'position' is the residue number (1-based) of the motif's first amino acid."""
         sites = []
 
-        # Convert DNA to protein sequence
-        protein_seq = str(Seq(sequence).translate())
+        # Convert the coding sequence to protein
+        _, protein_seq = self.cds_protein(sequence)
 
         for motif_pattern in self.ca_motifs:
             matches = re.finditer(motif_pattern, protein_seq)
             for match in matches:
                 sites.append({
                     'motif': motif_pattern,
-                    'position': match.start(),
+                    'position': match.start() + 1,
                     'sequence': match.group(),
-                    'in_known_domain': any(start <= match.start()*3 <= end
+                    'in_known_domain': any(start <= match.start() + 1 <= end
                                          for start, end in self.domains['calcium_binding'])
                 })
 

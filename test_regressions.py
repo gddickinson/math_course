@@ -99,29 +99,57 @@ class TestPatternAnalyzerEdgeCases(unittest.TestCase):
         self.assertIsNone(r["largest_prime_factor"])
 
 
+def _ip3r_mrna(n_res=2800, motif_at=None):
+    """Synthetic mRNA: 5' UTR (with a decoy in-frame-shifted ATG) + ATG + codons + TAA + 3' UTR.
+    Residue r (1-based, r >= 2) is coded so that its amino acid is AA[r % 20]; returns (mrna, protein, cds_start)."""
+    from Bio.Data.CodonTable import standard_dna_table
+    back = {}
+    for codon, aa in standard_dna_table.forward_table.items():
+        back.setdefault(aa, codon)
+    aa = "ACDEFGHIKLMNPQRSTVWY"
+    protein = "M" + "".join(aa[r % 20] for r in range(2, n_res + 1))
+    if motif_at:
+        protein = protein[:motif_at - 1] + "DDNS" + protein[motif_at + 3:]
+    utr5 = "GCATGCC"   # contains ATG out of frame, followed by a stop soon
+    cds = "".join(back[x] if x != "M" else "ATG" for x in protein) + "TAA"
+    return utr5 + cds + "GGGAAA", protein, len(utr5)
+
+
 @unittest.skipUnless(HAS_BIO, "biopython not installed")
 class TestIP3RAnalyzer(unittest.TestCase):
     """analyze_domains overwrote every result with the last region's slice (NameError on short sequences);
-    the PROSITE-style calcium motifs ('D-[DNS]-...') were used as regexes and could never match."""
+    the PROSITE-style calcium motifs ('D-[DNS]-...') were used as regexes and could never match;
+    the domain table is in amino-acid residues but was used as nucleotide positions of the whole mRNA."""
 
     def test_domains_short_sequence(self):
         from ip3r_analysis import IP3RAnalyzer
-        r = IP3RAnalyzer("test@example.org").analyze_domains("ATG" * 100)   # shorter than every domain
+        r = IP3RAnalyzer("test@example.org").analyze_domains("ATG" * 100)   # protein shorter than every domain
         self.assertEqual(r, {})
 
-    def test_domains_have_own_lengths(self):
+    def test_find_cds_skips_utr(self):
         from ip3r_analysis import IP3RAnalyzer
-        r = IP3RAnalyzer("test@example.org").analyze_domains("ATGGCC" * 500)  # 3000 nt
-        self.assertEqual(r["IP3_binding"]["length"], 604 - 224)
-        self.assertEqual(r["suppressor"]["length"], 1654 - 1574)
-        self.assertEqual(r["regulatory"]["total_length"], (1207 - 918) + (1654 - 1574))
-        self.assertEqual(r["regulatory"]["length"], r["regulatory"]["total_length"])
+        mrna, protein, start = _ip3r_mrna(300)
+        self.assertEqual(IP3RAnalyzer.find_cds(mrna), (start, start + 3 * len(protein) + 3))
 
-    def test_calcium_motif_matches(self):
+    def test_domains_cut_at_residues(self):
+        from Bio.Seq import Seq
         from ip3r_analysis import IP3RAnalyzer
-        # GAT GAC AAC TCC -> D D N S, an EF-hand-like D-[DNS]-[DNS]-[DNS] match
-        sites = IP3RAnalyzer("test@example.org").find_calcium_binding_sites("GATGACAACTCC")
-        self.assertTrue(any(s["sequence"] == "DDNS" for s in sites))
+        an = IP3RAnalyzer("test@example.org")
+        mrna, protein, start = _ip3r_mrna(2800)
+        r = an.analyze_domains(mrna)
+        self.assertEqual(r["IP3_binding"]["length"], 604 - 224 + 1)
+        self.assertEqual(r["IP3_binding"]["nt_length"], 3 * (604 - 224 + 1))
+        self.assertEqual(r["regulatory"]["total_length"], (1207 - 918 + 1) + (1654 - 1574 + 1))
+        dom = mrna[start + 3 * 223:start + 3 * 604]
+        self.assertEqual(str(Seq(dom).translate()), protein[223:604])   # residues 224..604, in frame
+        self.assertAlmostEqual(r["IP3_binding"]["hydrophobicity"], an._calculate_hydrophobicity(dom))
+
+    def test_calcium_motif_residue_number(self):
+        from ip3r_analysis import IP3RAnalyzer
+        mrna, _, _ = _ip3r_mrna(2800, motif_at=2300)
+        sites = IP3RAnalyzer("test@example.org").find_calcium_binding_sites(mrna)
+        hit = [s for s in sites if s["sequence"] == "DDNS" and s["position"] == 2300]
+        self.assertTrue(hit and hit[0]["in_known_domain"])
 
 
 @unittest.skipUnless(HAS_BIO, "biopython not installed")

@@ -31,10 +31,11 @@ export function mount(host, { data }) {
     + 'transcribed T→U unless the record is an mRNA), repeated k-mers of length 4–10, and the number patterns of the length.',
     'NCBISequenceAnalyzer.analyze_sequence(), visualize_sequence_patterns()');
   const f2 = figure(host, 'IP3 receptor domains and calcium-binding motifs',
-    'The script\'s domain table (IP3 binding core, calcium binding, channel region, suppressor, regulatory) is applied as positions in the '
-    + 'sequence you give; domains beyond its end are skipped. Hydrophobicity is the mean Kyte–Doolittle value of the translated domain. '
-    + 'Calcium motifs are EF-hand-like patterns searched in the translation (from the first base). Conservation needs sequences from several '
-    + 'species downloaded from NCBI, so it is empty here.', 'IP3RAnalyzer.analyze_domains(), find_calcium_binding_sites()');
+    'The script\'s domain table (IP3 binding core, calcium binding, channel region, suppressor, regulatory) gives amino-acid residue ranges of '
+    + 'the IP3R1 protein. They are mapped onto your mRNA through its coding sequence, taken as the longest ATG…stop reading frame: residues a–b '
+    + 'are nucleotides CDS start + 3(a−1) … CDS start + 3b. Domains beyond the end of the protein are skipped. Hydrophobicity is the mean '
+    + 'Kyte–Doolittle value of the domain\'s amino acids; calcium motifs are EF-hand-like patterns searched in the protein. Conservation needs '
+    + 'sequences from several species downloaded from NCBI, so it is empty here.', 'IP3RAnalyzer.analyze_domains(), find_calcium_binding_sites()');
   checkButton(f1, 'sequence', () => ({ seq: state.seq, mrna: state.mrna }), data);
   checkButton(f2, 'ip3r', () => ({ seq: state.seq }), data);
 
@@ -70,19 +71,19 @@ export function mount(host, { data }) {
 
     const ip = ip3r(state), names = Object.keys(DOMAINS);
     f2.out.innerHTML = '<div class="plot"></div>' + (Object.keys(ip.domains).length
-      ? table(['Domain', 'Length', 'GC fraction', 'Hydrophobicity (KD)'], Object.entries(ip.domains).map(([k, d]) =>
+      ? table(['Domain', 'Residues', 'GC fraction', 'Hydrophobicity (KD)'], Object.entries(ip.domains).map(([k, d]) =>
         [k + (d.regions ? ` (${d.regions.length} regions)` : ''), d.length, d.regions ? d.regions.map(x => num(x.gc_content, 3)).join(', ') : num(d.gc_content, 3),
           d.regions ? d.regions.map(x => num(x.hydrophobicity, 3)).join(', ') : num(d.hydrophobicity, 3)]))
-      : '<p class="mute">The sequence is shorter than every domain (the shortest ends at 604).</p>')
+      : `<p class="mute">The protein (${ip.protein.length} residues) is shorter than every domain (the shortest ends at residue 604).</p>`)
       + `<h3>Calcium-binding motifs: ${ip.sites.length} found</h3>`
-      + (ip.sites.length ? table(['Motif', 'Protein position', 'Match', 'In calcium-binding domain'],
+      + (ip.sites.length ? table(['Motif', 'Residue', 'Match', 'In calcium-binding domain'],
         ip.sites.slice(0, 40).map(t => [`<code>${esc(t.motif)}</code>`, t.position, `<code>${t.sequence}</code>`, t.in_known_domain ? 'yes' : 'no']))
         + (ip.sites.length > 40 ? `<p class="small mute">first 40 of ${ip.sites.length}</p>` : '') : '')
-      + `<details><summary class="small">Translation (${ip.protein.length} amino acids)</summary><pre class="prot">${esc(ip.protein)}</pre></details>`;
+      + `<p class="small">Coding sequence: nucleotides ${ip.cds[0] + 1}–${ip.cds[1]} (${ip.protein.length} residues).</p><details><summary class="small">Protein (${ip.protein.length} amino acids)</summary><pre class="prot">${esc(ip.protein)}</pre></details>`;
     const segs = names.flatMap((k, i) => DOMAINS[k].map(([a, e]) => [a, i, e, i, PALETTE[i % PALETTE.length], 14]));
-    chart(f2.out.querySelector('.plot'), { h: 220, ml: 118, title: 'IP3R domain structure (script positions) and your sequence length',
-      x: { label: 'sequence position', min: 0, max: Math.max(2800, s.length * 1.02) }, y: { min: -0.7, max: names.length - 0.3, ticks: names.map((k, i) => [i, k.replace('_', ' ')]) },
-      series: [{ type: 'segments', data: segs }, { type: 'line', x: [s.length, s.length], y: [-0.7, names.length], color: 'var(--warn)', dash: '5 4', label: 'end of your sequence' }] });
+    chart(f2.out.querySelector('.plot'), { h: 220, ml: 118, title: 'IP3R1 domain structure (residues) and the length of your protein',
+      x: { label: 'residue', min: 0, max: Math.max(2800, ip.protein.length * 1.02) }, y: { min: -0.7, max: names.length - 0.3, ticks: names.map((k, i) => [i, k.replace('_', ' ')]) },
+      series: [{ type: 'segments', data: segs }, { type: 'line', x: [ip.protein.length, ip.protein.length], y: [-0.7, names.length], color: 'var(--warn)', dash: '5 4', label: 'end of your protein' }] });
   }
   update();
 }

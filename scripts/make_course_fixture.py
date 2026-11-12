@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from test_regressions import _ip3r_mrna  # noqa: E402  (synthetic mRNA with a known CDS)
 from web.compute import data_tables, run  # noqa: E402
 
 OUT = ROOT / "tests" / "fixtures" / "course_fixture.json"
@@ -51,7 +52,8 @@ CASES = {
                 {"species": "ammonite", "n_whorls": 3, "n_points": 30, "growth_rate": 0.306}],
     "shell_stats": [{}],
     "sequence": [{"seq": SEQ, "mrna": False}, {"seq": SEQ * 3, "mrna": True}, {"seq": "GGCC" * 60 + "AT", "mrna": False}],
-    "ip3r": [{"seq": "GATGACAACTCC" * 250}, {"seq": (SEQ * 40)}],
+    "ip3r": [{"seq": "GATGACAACTCC" * 250}, {"seq": (SEQ * 40)}, {"seq": _ip3r_mrna(2800, motif_at=2300)[0]},
+             {"seq": "CCC" + _ip3r_mrna(700)[0]}],
 }
 
 
