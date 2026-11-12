@@ -14,3 +14,13 @@
   unused pandas/requests imports and missing biopython requirement; README code-structure section.
 - Open questions for George are listed in the web-interface report (IP3R domain positions in residues vs nucleotides,
   provenance of the tree/shell "real data", hyphenated duplicate scripts).
+
+## 2026-11-11 (later) — follow-up fixes after merge
+- Removed the 14 hyphenated duplicate scripts (byte-identical, unreferenced).
+- ip3r_analysis.py: domain table is in amino-acid residues; it is now mapped through the CDS (longest ATG..stop ORF,
+  `find_cds()` / `cds_protein()`), motif positions are residue numbers, conservation compares homologs in their own
+  CDS. Tested on a synthetic mRNA with UTRs and a known protein; JS port and fixture updated (101 cases).
+- Tree and shell data relabelled as illustrative example values: invented citations removed (`ShellMeasurement.source`),
+  `REAL_TREE_DATA` -> `EXAMPLE_TREE_DATA`, plot labels and web captions updated; no real source was verified, so none is cited.
+- Checks: pytest 60 passed, node 105 + text checks, screenshots static (13 routes) and local app all ok, all 26
+  "Check with Python" identical.
