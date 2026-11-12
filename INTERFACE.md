@@ -15,8 +15,8 @@
 | `bio_number_theory.py` | Number theory applied to biology (cicadas, DNA lengths) | `BioNumberTheory` |
 | `bio_sequence_analysis.py` | NCBI DNA sequence analysis (biopython, internet) | `NCBISequenceAnalyzer` |
 | `shell_growth_patterns.py` | Shell spiral growth models | `ShellParameters`, `ShellGrowthAnalysis` |
-| `shell_comparative_analysis.py` | Comparative shell measurements | `ShellMeasurement`, `ShellComparativeAnalysis` |
-| `tree_data_analysis.py` | Tree branching data statistics vs model | `TreeDataAnalysis` |
+| `shell_comparative_analysis.py` | Shell records vs temperature and age (illustrative example values) | `ShellMeasurement`, `ShellComparativeAnalysis` |
+| `tree_data_analysis.py` | Tree branching statistics vs model (illustrative example values) | `TreeDataAnalysis` |
 | `advanced_tree_patterns.py` | Tree model with season/light/nutrients | `TreeNode`, `AdvancedTreeModel` |
 | `ip3r_analysis.py` | IP3 receptor sequence/domain analysis (NCBI) | `IP3RAnalyzer` |
 | `math_bio_demo.py` | Demo combining the pattern analyzers and IP3R | (script) |

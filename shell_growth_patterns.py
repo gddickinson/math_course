@@ -16,11 +16,11 @@ class ShellParameters:
 class ShellGrowthAnalysis:
     """Analysis of shell growth patterns across different species"""
     
-    # Real shell parameters from research studies
+    # Illustrative example parameters (not fitted to measured shells)
     SPECIES_PARAMETERS = {
         'nautilus': ShellParameters(
             species='Nautilus pompilius',
-            growth_rate=0.17,  # Close to golden ratio
+            growth_rate=0.17,  # radius x e^(2*pi*0.17) ~ 2.9 per whorl (a golden spiral would be b ~ 0.306)
             whorl_spacing=0.33,
             aperture_growth=1.05,
             coiling_axis=0.0,

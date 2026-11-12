@@ -7,7 +7,7 @@ from datetime import datetime
 
 @dataclass
 class ShellMeasurement:
-    """Real shell measurement data"""
+    """One example shell record (illustrative values, not a measurement)"""
     species: str
     age: str  # 'modern' or geological period
     size: float  # mm
@@ -16,47 +16,46 @@ class ShellMeasurement:
     temperature: float  # °C (estimated for fossils)
     location: str
     thickness: float  # mm
-    source: str  # Research paper reference
 
 class ShellComparativeAnalysis:
-    """Analysis of real shell measurements across time and temperature"""
+    """Analysis of example shell records across time and temperature"""
     
-    # Real measurement data compiled from research papers
+    # Illustrative example values written for this course (not measurements; no published source)
     SHELL_DATA = {
         'nautilus': {
             'modern': [
                 ShellMeasurement('Nautilus pompilius', 'modern', 180.5, 3.2, 0.167, 22.0, 
-                               'Great Barrier Reef', 2.1, 'Ward et al. 2016'),
+                               'Great Barrier Reef', 2.1),
                 ShellMeasurement('Nautilus pompilius', 'modern', 175.2, 3.1, 0.165, 24.0,
-                               'Philippines', 2.0, 'Ward et al. 2016'),
+                               'Philippines', 2.0),
                 ShellMeasurement('Nautilus pompilius', 'modern', 182.3, 3.3, 0.169, 20.0,
-                               'Indonesia', 2.2, 'Ward et al. 2016')
+                               'Indonesia', 2.2)
             ],
             'fossil': [
                 ShellMeasurement('Nautilus praepompilius', 'Miocene', 165.5, 3.0, 0.162, 25.0,
-                               'Java', 1.8, 'Fossil Record Database'),
+                               'Java', 1.8),
                 ShellMeasurement('Nautilus praepompilius', 'Miocene', 170.2, 3.1, 0.164, 24.0,
-                               'Philippines', 1.9, 'Fossil Record Database')
+                               'Philippines', 1.9)
             ]
         },
         'ammonite': {
             'fossil': [
                 ShellMeasurement('Ammonites subplanatus', 'Jurassic', 120.5, 4.2, 0.158, 20.0,
-                               'Germany', 1.5, 'Paleontology Journal 2018'),
+                               'Germany', 1.5),
                 ShellMeasurement('Ammonites subplanatus', 'Jurassic', 125.3, 4.3, 0.160, 22.0,
-                               'UK', 1.6, 'Paleontology Journal 2018')
+                               'UK', 1.6)
             ]
         },
         'gastropod': {
             'modern': [
                 ShellMeasurement('Turritella communis', 'modern', 45.2, 12.3, 0.195, 18.0,
-                               'Mediterranean', 0.8, 'Marine Biology 2020'),
+                               'Mediterranean', 0.8),
                 ShellMeasurement('Turritella communis', 'modern', 42.8, 11.8, 0.192, 20.0,
-                               'Atlantic', 0.7, 'Marine Biology 2020')
+                               'Atlantic', 0.7)
             ],
             'fossil': [
                 ShellMeasurement('Turritella praecommunis', 'Pliocene', 40.5, 11.5, 0.190, 22.0,
-                               'Italy', 0.6, 'Fossil Record Database')
+                               'Italy', 0.6)
             ]
         }
     }
@@ -236,7 +235,7 @@ class ShellComparativeAnalysis:
         plt.show()
 
 def demonstrate_shell_analysis():
-    """Show analysis of real shell data"""
+    """Show analysis of the example shell data"""
     analyzer = ShellComparativeAnalysis()
     
     # 1. Temperature effects

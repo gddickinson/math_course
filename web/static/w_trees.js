@@ -48,11 +48,11 @@ function envTree(host, data) {
 }
 
 function dataFig(host, data) {
-  const f = figure(host, 'Branching measurements: summary statistics',
+  const f = figure(host, 'Example branching data: summary statistics',
     'Mean, standard deviation and 95% confidence interval (Student t) of the 20 values per measure that the script stores as '
-    + '"Real data from research papers (representative values)" (no source is given in the code). The tree on the right is drawn '
-    + 'with the mean angle and mean length ratio, four levels deep, as visualize_real_tree_structure() does.',
-    'TreeDataAnalysis.analyze_branching_patterns(), visualize_real_tree_structure()');
+    + 'illustrative example values (not field measurements; no published source). The tree on the right is drawn '
+    + 'with the mean angle and mean length ratio, four levels deep, as visualize_example_tree_structure() does.',
+    'TreeDataAnalysis.analyze_branching_patterns(), visualize_example_tree_structure()');
   let sp = 'oak';
   const show = () => {
     const st = treeStats({ species: sp }, data.tree_data), d = data.tree_data[sp];
@@ -74,9 +74,9 @@ function dataFig(host, data) {
 }
 
 function compareFig(host, data) {
-  const f = figure(host, 'Measurements versus the model',
+  const f = figure(host, 'Example data versus the model',
     'The script draws 20 model values per measure from a normal distribution around the model parameters (oak 35°, 0.75, 0.6; '
-    + 'pine 45°, 0.8, 0.7) and compares them with the stored values by a two-sample t-test and Cohen\'s d. The draws are random: '
+    + 'pine 45°, 0.8, 0.7) and compares them with the example values by a two-sample t-test and Cohen\'s d. The draws are random: '
     + 'the seed here reproduces <code>np.random.seed(seed)</code> in Python.', 'TreeDataAnalysis.compare_with_model(), visualize_comparisons()');
   const s = { species: 'oak', seed: 1 };
   const show = () => {
@@ -87,7 +87,7 @@ function compareFig(host, data) {
     })) + `<div class="three">${MEAS.map((_, i) => `<div class="m${i}"></div>`).join('')}</div>`;
     MEAS.forEach(([k, t], i) => {
       const jit = (n, c) => Array.from({ length: n }, (_, j) => c + ((j * 7919) % 13 - 6) / 30);
-      chart(f.out.querySelector(`.m${i}`), { w: 300, h: 280, title: t, x: { min: 0.4, max: 2.6, ticks: [[1, 'stored data'], [2, 'model']] },
+      chart(f.out.querySelector(`.m${i}`), { w: 300, h: 280, title: t, x: { min: 0.4, max: 2.6, ticks: [[1, 'example data'], [2, 'model']] },
         series: [{ type: 'scatter', x: jit(real[k].length, 1), y: real[k], color: PALETTE[2], r: 3 },
           { type: 'scatter', x: jit(r.model[k].length, 2), y: r.model[k], color: PALETTE[0], r: 3 }] });
     });

@@ -5,12 +5,12 @@ from typing import List, Tuple, Dict
 
 class TreeDataAnalysis:
     """
-    Analysis and comparison of real tree data with model predictions
-    Using compiled research data from various studies
+    Analysis and comparison of example tree branching data with model predictions.
+    The data are illustrative example values written for this course, not field measurements.
     """
     
-    # Real data from research papers (representative values)
-    REAL_TREE_DATA = {
+    # Illustrative example values (not measurements; no published source)
+    EXAMPLE_TREE_DATA = {
         'oak': {
             'branching_angles': [
                 35.2, 37.1, 34.8, 36.5, 33.9, 35.8, 34.2, 36.9, 35.5, 34.7,
@@ -46,32 +46,32 @@ class TreeDataAnalysis:
         
     def analyze_branching_patterns(self, species: str) -> Dict:
         """
-        Analyze branching patterns from real data and compare with model
+        Analyze branching patterns of the example data and compare with model
         Returns statistical analysis of branching characteristics
         """
-        real_data = self.REAL_TREE_DATA[species]
+        example_data = self.EXAMPLE_TREE_DATA[species]
         
         analysis = {
             'branching_angles': {
-                'mean': np.mean(real_data['branching_angles']),
-                'std': np.std(real_data['branching_angles']),
-                'ci': stats.t.interval(0.95, len(real_data['branching_angles'])-1,
-                                    loc=np.mean(real_data['branching_angles']),
-                                    scale=stats.sem(real_data['branching_angles']))
+                'mean': np.mean(example_data['branching_angles']),
+                'std': np.std(example_data['branching_angles']),
+                'ci': stats.t.interval(0.95, len(example_data['branching_angles'])-1,
+                                    loc=np.mean(example_data['branching_angles']),
+                                    scale=stats.sem(example_data['branching_angles']))
             },
             'length_ratios': {
-                'mean': np.mean(real_data['length_ratios']),
-                'std': np.std(real_data['length_ratios']),
-                'ci': stats.t.interval(0.95, len(real_data['length_ratios'])-1,
-                                    loc=np.mean(real_data['length_ratios']),
-                                    scale=stats.sem(real_data['length_ratios']))
+                'mean': np.mean(example_data['length_ratios']),
+                'std': np.std(example_data['length_ratios']),
+                'ci': stats.t.interval(0.95, len(example_data['length_ratios'])-1,
+                                    loc=np.mean(example_data['length_ratios']),
+                                    scale=stats.sem(example_data['length_ratios']))
             },
             'thickness_ratios': {
-                'mean': np.mean(real_data['thickness_ratios']),
-                'std': np.std(real_data['thickness_ratios']),
-                'ci': stats.t.interval(0.95, len(real_data['thickness_ratios'])-1,
-                                    loc=np.mean(real_data['thickness_ratios']),
-                                    scale=stats.sem(real_data['thickness_ratios']))
+                'mean': np.mean(example_data['thickness_ratios']),
+                'std': np.std(example_data['thickness_ratios']),
+                'ci': stats.t.interval(0.95, len(example_data['thickness_ratios'])-1,
+                                    loc=np.mean(example_data['thickness_ratios']),
+                                    scale=stats.sem(example_data['thickness_ratios']))
             }
         }
         
@@ -79,7 +79,7 @@ class TreeDataAnalysis:
 
     def generate_model_predictions(self, species: str, n_samples: int = 20) -> Dict:
         """
-        Generate model predictions for comparison with real data
+        Generate model predictions for comparison with the example data
         """
         # Use the parameters from our previous tree model
         if species == 'oak':
@@ -104,10 +104,10 @@ class TreeDataAnalysis:
 
     def compare_with_model(self, species: str) -> Dict:
         """
-        Compare real data with model predictions
+        Compare the example data with model predictions
         Returns statistical comparisons and effect sizes
         """
-        real_data = self.REAL_TREE_DATA[species]
+        example_data = self.EXAMPLE_TREE_DATA[species]
         model_data = self.generate_model_predictions(species)
         
         comparisons = {}
@@ -115,13 +115,13 @@ class TreeDataAnalysis:
         for measure in ['branching_angles', 'length_ratios', 'thickness_ratios']:
             # Perform t-test
             t_stat, p_value = stats.ttest_ind(
-                real_data[measure],
+                example_data[measure],
                 model_data[measure]
             )
             
             # Calculate effect size (Cohen's d)
-            d = (np.mean(real_data[measure]) - np.mean(model_data[measure])) / \
-                np.sqrt((np.var(real_data[measure]) + np.var(model_data[measure])) / 2)
+            d = (np.mean(example_data[measure]) - np.mean(model_data[measure])) / \
+                np.sqrt((np.var(example_data[measure]) + np.var(model_data[measure])) / 2)
                 
             comparisons[measure] = {
                 't_statistic': t_stat,
@@ -133,9 +133,9 @@ class TreeDataAnalysis:
 
     def visualize_comparisons(self, species: str):
         """
-        Create visualizations comparing real data with model predictions
+        Create visualizations comparing the example data with model predictions
         """
-        real_data = self.REAL_TREE_DATA[species]
+        example_data = self.EXAMPLE_TREE_DATA[species]
         model_data = self.generate_model_predictions(species)
         
         fig, axes = plt.subplots(1, 3, figsize=(20, 6))
@@ -144,7 +144,7 @@ class TreeDataAnalysis:
         
         for ax, measure, title in zip(axes, measures, titles):
             # Create violin plots
-            parts = ax.violinplot([real_data[measure], model_data[measure]],
+            parts = ax.violinplot([example_data[measure], model_data[measure]],
                                 showmeans=True, showextrema=True)
             
             # Customize colors
@@ -152,22 +152,22 @@ class TreeDataAnalysis:
             parts['bodies'][1].set_facecolor('lightgreen')
             
             # Add box plots inside
-            ax.boxplot([real_data[measure], model_data[measure]],
+            ax.boxplot([example_data[measure], model_data[measure]],
                       positions=[1, 2], widths=0.2)
             
             ax.set_title(title)
             ax.set_xticks([1, 2])
-            ax.set_xticklabels(['Real Data', 'Model'])
+            ax.set_xticklabels(['Example data', 'Model'])
             ax.grid(True, alpha=0.3)
             
-        plt.suptitle(f'Comparison of Real and Model Data for {species.capitalize()}')
+        plt.suptitle(f'Comparison of Example and Model Data for {species.capitalize()}')
         plt.tight_layout()
 
-    def visualize_real_tree_structure(self, species: str):
+    def visualize_example_tree_structure(self, species: str):
         """
-        Create visualization of real tree branching structure based on measurements
+        Create visualization of a tree branching structure built from the example data
         """
-        real_data = self.REAL_TREE_DATA[species]
+        example_data = self.EXAMPLE_TREE_DATA[species]
         
         def plot_branch(ax, start, angle, length, depth=0, max_depth=4):
             if depth >= max_depth:
@@ -184,23 +184,23 @@ class TreeDataAnalysis:
             
             # Create sub-branches
             if depth < max_depth:
-                angle_left = angle + np.mean(real_data['branching_angles'])
-                angle_right = angle - np.mean(real_data['branching_angles'])
-                new_length = length * np.mean(real_data['length_ratios'])
+                angle_left = angle + np.mean(example_data['branching_angles'])
+                angle_right = angle - np.mean(example_data['branching_angles'])
+                new_length = length * np.mean(example_data['length_ratios'])
                 
                 plot_branch(ax, end, angle_left, new_length, depth + 1, max_depth)
                 plot_branch(ax, end, angle_right, new_length, depth + 1, max_depth)
         
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 8))
         
-        # Plot real tree structure
+        # Plot tree structure from the example means
         plot_branch(ax1, (0, 0), 90, 1)
-        ax1.set_title(f'Real {species.capitalize()} Structure')
+        ax1.set_title(f'{species.capitalize()} Structure (example data)')
         ax1.axis('equal')
         ax1.grid(True, alpha=0.3)
         
         # Plot angle distribution
-        ax2.hist(real_data['branching_angles'], bins=15, color='lightblue',
+        ax2.hist(example_data['branching_angles'], bins=15, color='lightblue',
                 alpha=0.7, density=True)
         ax2.set_title('Branching Angle Distribution')
         ax2.set_xlabel('Angle (degrees)')
@@ -210,14 +210,14 @@ class TreeDataAnalysis:
         plt.tight_layout()
 
 def demonstrate_analysis():
-    """Show analysis of real tree data and model comparisons"""
+    """Show analysis of the example tree data and model comparisons"""
     analyzer = TreeDataAnalysis()
     
     for species in ['oak', 'pine']:
         print(f"\nAnalyzing {species.capitalize()} Trees:")
         
-        # 1. Basic analysis of real data
-        print("\nReal Data Analysis:")
+        # 1. Basic analysis of the example data
+        print("\nExample Data Analysis (illustrative values):")
         analysis = analyzer.analyze_branching_patterns(species)
         for measure, stats in analysis.items():
             print(f"\n{measure}:")
@@ -239,7 +239,7 @@ def demonstrate_analysis():
         analyzer.visualize_comparisons(species)
         plt.show()
         
-        analyzer.visualize_real_tree_structure(species)
+        analyzer.visualize_example_tree_structure(species)
         plt.show()
 
 if __name__ == "__main__":

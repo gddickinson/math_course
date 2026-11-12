@@ -116,5 +116,5 @@ def test_data_tables_come_from_the_scripts():
     from shell_comparative_analysis import ShellComparativeAnalysis
     from tree_data_analysis import TreeDataAnalysis
     d = client.get("/api/data").json()
-    assert d["tree_data"] == TreeDataAnalysis.REAL_TREE_DATA
+    assert d["tree_data"] == TreeDataAnalysis.EXAMPLE_TREE_DATA
     assert d["shell_data"].keys() == ShellComparativeAnalysis.SHELL_DATA.keys()

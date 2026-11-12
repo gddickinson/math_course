@@ -195,7 +195,7 @@ def data_tables():
     """Parameter tables and measurement data held in the scripts' class attributes (for /api/data)."""
     from dataclasses import asdict
     return {"tree_species": AdvancedTreeModel.SPECIES_PARAMS, "seasons": AdvancedTreeModel.SEASON_EFFECTS,
-            "tree_data": TreeDataAnalysis.REAL_TREE_DATA,
+            "tree_data": TreeDataAnalysis.EXAMPLE_TREE_DATA,
             "shell_species": {k: asdict(v) for k, v in ShellGrowthAnalysis.SPECIES_PARAMETERS.items()},
             "shell_data": {sp: {per: [asdict(m) for m in ms] for per, ms in d.items()}
                            for sp, d in ShellComparativeAnalysis.SHELL_DATA.items()}}

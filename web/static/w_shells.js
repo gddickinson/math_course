@@ -9,7 +9,8 @@ import { figure, sl, select, table, num, checkButton } from './ui.js';
 function spiralFig(host, data) {
   const f = figure(host, 'Shell spirals by species: top and side view',
     'r = (e^b)^t for t over n whorls; species with a tilted coiling axis (the Turritella gastropod, 15°) also rise along z = t·tan(axis)·whorl spacing. '
-    + 'Growth ratio = e^(2πb), the radius factor per whorl, and its distance from φ ≈ 1.618 are the script\'s metrics. Dot colour = height.',
+    + 'Growth ratio = e^(2πb), the radius factor per whorl, and its distance from φ ≈ 1.618 are the script\'s metrics. '
+    + 'The species parameters are illustrative example values, not fitted to measured shells. Dot colour = height.',
     'ShellGrowthAnalysis.generate_shell_spiral(), calculate_growth_metrics(), visualize_shell()');
   const s = { species: 'nautilus', n_whorls: 4, n_points: 1000 };
   let b = data.shell_species.nautilus.growth_rate;
@@ -40,9 +41,10 @@ function spiralFig(host, data) {
 }
 
 function compareFig(host, data) {
-  const f = figure(host, 'Shell measurements: temperature, size and age',
-    'The values and the citations are those written in shell_comparative_analysis.py ("Real measurement data compiled from research papers"); '
-    + 'they are not checked here. Pearson correlations over all specimens, and modern versus fossil means with the % change.',
+  const f = figure(host, 'Example shell records: temperature, size and age',
+    'The records are illustrative example values written in shell_comparative_analysis.py, not measurements, and have no published source: '
+    + 'use them to learn the methods, not to draw conclusions about real shells. Pearson correlations over all records, and modern versus '
+    + 'fossil means with the % change.',
     'ShellComparativeAnalysis.analyze_temperature_effects(), compare_modern_fossil()');
   const D = data.shell_data, r = shellStats({}, D);
   const all = Object.entries(D).flatMap(([sp, per]) => Object.entries(per).flatMap(([p, ms]) => ms.map(m => ({ ...m, sp, p }))));
@@ -54,13 +56,13 @@ function compareFig(host, data) {
   const [rg, pg] = r.temperature_growth_correlation, [rs, ps] = r.temperature_size_correlation;
   f.out.innerHTML = `<div class="two"><div class="p1"></div><div class="p2"></div></div>
     <p>Temperature–growth correlation r = ${num(rg, 3)} (p = ${num(pg, 3)}); temperature–size r = ${num(rs, 3)} (p = ${num(ps, 3)});
-    ${all.length} specimens, mean growth rate ${num(r.mean_growth_rate, 4)}, mean temperature ${num(r.mean_temperature, 1)} °C.</p>
+    ${all.length} example records, mean growth rate ${num(r.mean_growth_rate, 4)}, mean temperature ${num(r.mean_temperature, 1)} °C.</p>
     <div class="three"><div class="b0"></div><div class="b1"></div><div class="b2"></div></div>`
     + table(['Species', 'Size change', 'Growth-rate change', 'Thickness change'], Object.entries(r.compare).map(([sp, c]) =>
       (c.error ? [sp, `<span class="mute">${esc(c.error)}</span>`, '', '']
         : [sp, ...['size', 'growth_rate', 'thickness'].map(k => `${c.differences[k] > 0 ? '+' : ''}${c.differences[k].toFixed(1)}%`)])))
-    + table(['Species', 'Period', 'Size (mm)', 'Whorls', 'Growth rate', 'Temp (°C)', 'Thickness (mm)', 'Location', 'Source (as cited in the script)'],
-      all.map(m => [esc(m.species), esc(m.age), m.size, m.whorl_count, m.growth_rate, m.temperature, m.thickness, esc(m.location), esc(m.source)]), 'small');
+    + table(['Species', 'Period', 'Size (mm)', 'Whorls', 'Growth rate', 'Temp (°C)', 'Thickness (mm)', 'Location'],
+      all.map(m => [esc(m.species), esc(m.age), m.size, m.whorl_count, m.growth_rate, m.temperature, m.thickness, esc(m.location)]), 'small');
   chart(f.out.querySelector('.p1'), { w: 420, h: 300, title: 'Temperature effect on growth rate', x: { label: 'temperature (°C)' },
     y: { label: 'growth rate' }, series: series('growth_rate') });
   chart(f.out.querySelector('.p2'), { w: 420, h: 300, title: 'Temperature effect on size', x: { label: 'temperature (°C)' },

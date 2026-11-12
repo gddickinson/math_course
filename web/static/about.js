@@ -14,8 +14,9 @@ route('about', () => {
     <li><b>Live figures</b>: the maths of each script ported to JavaScript and tested against the Python results
       (<code>web/static/*_engine.js</code>, <code>tests/fixtures/course_fixture.json</code>).</li>
     <li><b>Data</b>: the tree, shell and species tables are the values written in the scripts' classes
-      (<code>REAL_TREE_DATA</code>, <code>SHELL_DATA</code>, <code>SPECIES_PARAMETERS</code>, ...) with the sources the
-      scripts cite; the course does not include downloaded datasets. Sequences are pasted by you (or random).</li>
+      (<code>EXAMPLE_TREE_DATA</code>, <code>SHELL_DATA</code>, <code>SPECIES_PARAMETERS</code>, ...): illustrative example
+      values written for the course, not measurements; the course does not include measured datasets. Sequences are
+      pasted by you (or random).</li>
     <li>${isStatic() ? 'This static copy needs no server.' : 'This local app'} also ${isStatic() ? 'has a local version that can' : 'can'}
       re-run any figure through the real Python code ("Check with Python").</li>
   </ul>
